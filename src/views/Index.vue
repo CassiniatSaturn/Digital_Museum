@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class=" bg-purple-300">
     Interact with smart contract
-    <input type="text" v-model="brand" />
+    <input type="text" v-model="brand"  />
     <input type="text" v-model="data" />
     <button @click="handleInput">SUBMIT</button>
     newbrand:{{ newbrand }}newdata:{{ newdata }}
