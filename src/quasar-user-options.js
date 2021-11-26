@@ -8,5 +8,8 @@ export default {
   config: {},
   plugins: {
   },
+  extras: [
+    'material-icons'
+  ],
   lang: lang
 }
