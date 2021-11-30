@@ -9,6 +9,9 @@ import 'quasar/dist/quasar.css'
 import '@quasar/extras/eva-icons/eva-icons.css'
 import '@quasar/extras/roboto-font/roboto-font.css'
 import '@quasar/extras/material-icons/material-icons.css'
+import ipfs from 'ipfs-http-client'
+import "ant-design-vue/dist/antd.css";
+import { Upload } from 'ant-design-vue'
 const app = createApp(App)
 
-app.use(store).use(router).use(Quasar).mount('#app')
+app.use(store).use(router).use(Quasar).use(Upload).mount('#app')

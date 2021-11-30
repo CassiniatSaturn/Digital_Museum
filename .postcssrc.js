@@ -1,5 +1,6 @@
 const plugins = [
-  require('autoprefixer')
+  require('autoprefixer'),
+  require('tailwindcss'),
 ]
 
 if (process.env.QUASAR_RTL) {
