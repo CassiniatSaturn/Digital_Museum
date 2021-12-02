@@ -1,16 +1,16 @@
 <template>
   <div class="bg-purple-300">
     <div>
-      <p>作品名稱</p>
+      <p>展品名称</p>
       <input type="text" v-model="cName" />
     </div>
     <div>
-      <p>作者名稱</p>
+      <p>作者</p>
       <input type="text" v-model="author" />
     </div>
     <div>
-      <p>詳情hash</p>
-      <input type="text" v-model="detailHash" />
+      <p>描述</p>
+      <input type="text" v-model="description" />
     </div>
     <!-- upload -->
     <a-upload
@@ -28,10 +28,6 @@
         <div class="ant-upload-text">Upload</div>
       </div>
     </a-upload>
-    <div>
-      <p>圖片hash</p>
-      <input type="text" v-model="imgHash" />
-    </div>
     <div>
       <p>朝代</p>
       <input type="text" v-model="dynasty" />
@@ -56,28 +52,42 @@ import { Collection } from "@/types";
 import { Upload } from "ant-design-vue";
 import { message } from "ant-design-vue";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons-vue";
-import * as IPFS from "ipfs-core";
+import * as ipfs_core from "ipfs-core";
+import { IPFS } from "ipfs-core-types";
+
+/* create the instance of ipfs */
+let ipfs = {} as IPFS;
+onMounted(async () => {
+  ipfs = await ipfs_core.create();
+});
 
 /* create a collection */
 const cName = ref("");
 const author = ref("");
-const detailHash = ref("");
-const imgHash = ref("");
+const description = ref("");
 const dynasty = ref("");
 const typeList = ["jewelry", "painting", "pottery"];
 const displayedValue = ref(typeList[0]);
 const type = ref(0);
+let desHash = ref("");
 
 const createNewCollection = async () => {
-  await createCollection(
-    cName.value,
-    author.value,
-    detailHash.value,
-    dynasty.value,
-    imgHash.value,
-    type.value
-  );
-  fetchCollections();
+  /* upload the description to IPFS */
+  ipfs.add(description.value).then((result)=>{
+    desHash.value = result.path
+    console.log(desHash.value);
+  }).then(async()=>{
+    /* uoload to Ethereum */
+    await createCollection(
+      cName.value,
+      author.value,
+      desHash.value,
+      imgHash.value,
+      dynasty.value,
+      type.value
+    );
+  })
+  await fetchCollections();
 };
 
 /* fetch the collection list */
@@ -86,16 +96,12 @@ const fetchCollections = async () => {
   state.collectionList = await getCollections();
   console.log(state.collectionList);
 };
-const handleUpdate = (value: any) => {
-  console.log(11);
-
-  console.log(value);
-};
 
 /* Upload img to IPFS */
 const fileList = ref([]);
 const loading = ref<boolean>(false);
-const imageUrl = ref<string>("");
+let imgHash = ref("");
+let imageUrl = ref<string>("");
 interface FileItem {
   uid: string;
   name?: string;
@@ -114,16 +120,16 @@ interface FileInfo {
 
 const handleChange = (info: FileInfo) => {
   loading.value = true;
-  /* transfer blob to unit8array */
   const reader = new FileReader();
   reader.readAsArrayBuffer(info.file.originFileObj);
   reader.onloadend = async () => {
     const buffer = new Buffer(reader.result as ArrayBuffer);
     /* upload to IPFS */
-    const ipfs = await IPFS.create();
-    ipfs.add(buffer).then((result)=>{
-      console.log(result.path); 
-    })
+    ipfs.add(buffer).then((result) => {
+      imgHash.value = result.path;
+      imageUrl.value = getImgUrl(imgHash.value);
+      console.log(imgHash.value);
+    });
   };
 };
 </script>

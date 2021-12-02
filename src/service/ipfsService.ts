@@ -1,18 +1,6 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
-import * as IPFS from 'ipfs-core'
+import * as ipfs_core from 'ipfs-core'
 
-// connect to the default API address http://localhost:5001
-/*  host?: string;
-    port?: number;
-    protocol?: string;
-    headers?: Headers | Record<string, string>;
-    timeout?: number | string;
-    apiPath?: string;
-    url?: URL | string | Multiaddr;
-    ipld?: Partial<IPLDOptions>;
-    agent?: HttpAgent | HttpsAgent; */
-// const url = new URL('/ipfsApi')
-// const baseIpfs = create({url:'/ipfsApi'})
 const baseURL = 'https://ipfs.io/ipfs'
 const ipfsAxios = axios.create({
   baseURL: baseURL,
