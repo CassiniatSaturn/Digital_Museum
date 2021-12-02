@@ -5,12 +5,12 @@ contract DigitalMuseum {
     /* details of the collection */
     struct Collection {
         uint256 id;
-        string name;
+        string cName;
         string author;
-        string detailhash;
-        string imghash;
+        string detailHash;
+        string imgHash;
         string dynasty;
-        Category class;
+        Category genre;
     }
     enum Category {
         jewelry,

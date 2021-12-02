@@ -24,9 +24,9 @@ class DigitalMuseumWeb3 {
 }
 
 /* address of contract */
-const address = '0x0Acef98a097041F8DaE14498AbB6Cc7D8c96fDA8'
+const address = '0x160A429C6E1954220615E244E094ce1B9d75605b'
 /* accout */
-const from = '0x874533B5573a8196C029CA69D1F12826cC695316'
+const from = '0x03E462A632c42593F42ba57738b642A2272Bc06C'
 const contract = new web3.eth.Contract(DigitalMuseum.abi as AbiItem[], address)
 const digitalMuseum = new DigitalMuseumWeb3(address, from)
 

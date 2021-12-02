@@ -40,7 +40,7 @@
         @update:modelValue="type = typeList.indexOf(displayedValue)"
       />
     </div>
-    <button @click="createNewCollection">創建</button>
+    <button @click="createNewCollection">创建</button>
   </div>
 </template>
 
@@ -57,9 +57,10 @@ import { IPFS } from "ipfs-core-types";
 
 /* create the instance of ipfs */
 let ipfs = {} as IPFS;
-onMounted(async () => {
+
+(async () => {
   ipfs = await ipfs_core.create();
-});
+})();
 
 /* create a collection */
 const cName = ref("");
@@ -73,20 +74,23 @@ let desHash = ref("");
 
 const createNewCollection = async () => {
   /* upload the description to IPFS */
-  ipfs.add(description.value).then((result)=>{
-    desHash.value = result.path
-    console.log(desHash.value);
-  }).then(async()=>{
-    /* uoload to Ethereum */
-    await createCollection(
-      cName.value,
-      author.value,
-      desHash.value,
-      imgHash.value,
-      dynasty.value,
-      type.value
-    );
-  })
+  ipfs
+    .add(description.value)
+    .then((result) => {
+      desHash.value = result.path;
+      console.log(desHash.value);
+    })
+    .then(async () => {
+      /* uoload to Ethereum */
+      await createCollection(
+        cName.value,
+        author.value,
+        desHash.value,
+        imgHash.value,
+        dynasty.value,
+        type.value
+      );
+    });
   await fetchCollections();
 };
 
