@@ -1,5 +1,6 @@
 <template>
-  <div class="bg-purple-300">
+  <div :class="myClass.header">
+    <svg-icon iconClass="like" class="w-10 h-10 text-blue-600" @clickSvg="handleClick" />
     <div>
       <p>展品名称</p>
       <input type="text" v-model="cName" />
@@ -54,7 +55,9 @@ import { message } from "ant-design-vue";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons-vue";
 import * as ipfs_core from "ipfs-core";
 import { IPFS } from "ipfs-core-types";
+import classes from "@/assets/css/style.module.css"
 
+const myClass = ref(classes)
 /* create the instance of ipfs */
 let ipfs = {} as IPFS;
 
@@ -136,6 +139,10 @@ const handleChange = (info: FileInfo) => {
     });
   };
 };
+
+const handleClick = ()=>{
+  console.log(1);
+}
 </script>
 
 <style scoped>

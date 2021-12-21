@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -47,6 +47,7 @@
     "postcss-rtl": "^1.2.3",
     "sass": "1.32.12",
     "sass-loader": "^10.1.0",
+    "svg-sprite-loader": "^6.0.11",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.17",
     "typescript": "~4.1.5",
     "vue-cli-plugin-quasar": "~4.0.4"

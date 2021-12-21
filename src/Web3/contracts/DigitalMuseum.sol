@@ -27,6 +27,7 @@ contract DigitalMuseum {
         uint256 gasLeft
     );
     address[] private collectionList;
+    mapping(address=>uint[]) private favorList;
 
     constructor(){
     /* only official account is allowed to create collections */
@@ -53,6 +54,16 @@ contract DigitalMuseum {
 
     function getCollections() public view returns(Collection[] memory){
         return collections;
+    }
+
+    /* add collection to favorite list */
+    function addToFavor(uint index) payable public returns(uint[] memory){
+        favorList[msg.sender].push(index);
+        return favorList[payable(msg.sender)];
+    }
+
+    function getFavorList() public view returns(uint[] memory){
+        return favorList[payable(msg.sender)];
     }
 
 }

@@ -12,6 +12,10 @@ import '@quasar/extras/material-icons/material-icons.css'
 import ipfs from 'ipfs-http-client'
 import "ant-design-vue/dist/antd.css";
 import { Upload } from 'ant-design-vue'
+import plugin from "@/icons/index";
+
 const app = createApp(App)
 
-app.use(store).use(router).use(Quasar).use(Upload).mount('#app')
+app.use(store).use(router).use(Quasar).use(Upload).use(plugin, {
+    imports: []
+}).mount('#app')
