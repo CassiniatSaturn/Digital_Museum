@@ -31,6 +31,8 @@ let imgUrl = ref("");
 
 (async () => {
   getCollections().then((list) => {
+    console.log(list);
+    
     list.map((item: Collection) => {
       const { id, cName, author, dynasty, genre, imgHash } = item;
       let detailHash: string;
