@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive, computed, toRefs } from "vue";
-import { getCollections, createCollection } from "@/service/ethService";
+import { getCollections, createCollection } from "@/service/EthService/museumService";
 import { fetchFromIpfs, getImgUrl } from "@/service/ipfsService";
 import { Collection } from "@/types";
 import { Upload } from "ant-design-vue";

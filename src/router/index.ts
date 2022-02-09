@@ -11,6 +11,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'CreateCollection',
     component: () => import('@/views/management/Index.vue')
   },
+  {
+    path: '/createItems',
+    name: 'CreateItems',
+    component: () => import('@/views/management/createItems.vue')
+  },
 ]
 
 const router = createRouter({

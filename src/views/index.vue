@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { getCollections } from "@/service/ethService";
+import { getCollections } from "@/service/EthService/museumService";
 import { computed, onMounted } from "@vue/runtime-core";
 import { reactive, ref } from "vue";
 import { Collection } from "@/types";

@@ -13,3 +13,23 @@ export enum Category {
   painting,
   pottery
 }
+
+
+/* 
+struct MarketItem {
+        uint256 itemId;
+        address nftContractAdd;
+        uint256 tokenId;
+        uint256 price;
+        address payable seller;
+        address payable owner;
+        bool sold;
+    }
+ */
+
+export interface MarketItem{
+  itemId?:number,
+  nftContractAdd:string,
+  tokenId:number,
+  price:number
+}

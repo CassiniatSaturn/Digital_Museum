@@ -1,18 +1,26 @@
 import Web3 from 'web3'
 import DigitalMuseum from '../build/contracts/DigitalMuseum.json'
+import Market from '../build/contracts/Market.json'
+import NFT from '../build/contracts/NFT.json'
 import { AbiItem } from 'web3-utils';
-/* 实例化web3对象
-链接到本地http协议的node */
+import { digitalmuseumaddress, marketaddress, nftaddress } from '../contracts/config'
 
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
-// web3.eth.getAccounts().then(val => {
-//   console.log(val);
-// });
-/* 启动浏览器中的metamask */
-// web3 = new Web3(Web3.givenProvider)
+/* Creates web3 service*/
+let web3 = new Web3()
+if ((window as any).ethereum) {
+  web3 = new Web3((window as any).ethereum)
+} else if ((window as any).web3) {
+  web3 = new Web3(web3.currentProvider)
+} else {
+  alert('你需要先安装MetaMask')
+}
+(window as any).ethereum.enable()
+console.log("web3 success")
 
-/* 合约初始化 */
+/* Official museum account */
+const from = '0x03E462A632c42593F42ba57738b642A2272Bc06C'
 
+/* Interacting contracts */
 class DigitalMuseumWeb3 {
   address: string
   from: string
@@ -23,16 +31,16 @@ class DigitalMuseumWeb3 {
   }
 }
 
-/* address of contract */
-const address = '0x160A429C6E1954220615E244E094ce1B9d75605b'
-/* accout */
-const from = '0x03E462A632c42593F42ba57738b642A2272Bc06C'
-const contract = new web3.eth.Contract(DigitalMuseum.abi as AbiItem[], address)
-const digitalMuseum = new DigitalMuseumWeb3(address, from)
+const digitalMuseum = new DigitalMuseumWeb3(digitalmuseumaddress, from)
+const museumContract = new web3.eth.Contract(DigitalMuseum.abi as AbiItem[], digitalmuseumaddress)
+const nftContract = new web3.eth.Contract(NFT.abi as AbiItem[], nftaddress)
+const mktContract = new web3.eth.Contract(Market.abi as AbiItem[], marketaddress)
 
 export {
   web3,
   digitalMuseum,
-  contract
+  museumContract,
+  nftContract,
+  mktContract
 }
 
