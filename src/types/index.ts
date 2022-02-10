@@ -28,8 +28,8 @@ struct MarketItem {
  */
 
 export interface MarketItem{
-  itemId?:number,
+  itemId?:string,
   nftContractAdd:string,
-  tokenId:number,
-  price:number
+  tokenId:string,
+  price:string
 }

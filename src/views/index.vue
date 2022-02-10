@@ -7,7 +7,7 @@
       <div>分类{{ transGenre(item.genre) }}</div>
       <div>详情{{ item.detailHash }}</div>
       <div>朝代{{ item.dynasty }}</div>
-      <img :src="getImgUrl(item.imgHash)" class="w-20" />
+      <img :src="getFileUrl(item.imgHash)" class="w-20" />
       <q-chip clickable color="red" text-color="white" @click="addToFavor(index)" icon="favorite">
         收藏
       </q-chip>
@@ -21,7 +21,7 @@ import { getCollections } from "@/service/EthService/museumService";
 import { computed, onMounted } from "@vue/runtime-core";
 import { reactive, ref } from "vue";
 import { Collection } from "@/types";
-import { fetchFromIpfs, getImgUrl } from "@/service/ipfsService";
+import { fetchFromIpfs, getFileUrl } from "@/service/ipfsService";
 import { Category } from "@/types";
 import svgIcon from "@/components/svgIcon.vue"
 

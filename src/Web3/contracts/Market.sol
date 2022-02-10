@@ -92,7 +92,7 @@ contract Market is ReentrancyGuard {
         uint256 price = idToMktItem[itemId].price;
         uint256 tokenId = idToMktItem[itemId].tokenId;
         require(
-            price == msg.value,
+            price == msg.value/(1 ether),
             "Please submit the asking price in order to complete the purchase"
         );
 

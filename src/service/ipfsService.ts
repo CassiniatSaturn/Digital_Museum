@@ -26,6 +26,6 @@ export function fetchFromIpfs(hash: string) {
     method: 'get',
   })
 }
-export function getImgUrl(hash: string) {
+export function getFileUrl(hash: string) {
   return baseURL + '/' + hash
 }

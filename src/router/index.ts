@@ -16,6 +16,21 @@ const routes: Array<RouteRecordRaw> = [
     name: 'CreateItems',
     component: () => import('@/views/management/createItems.vue')
   },
+  {
+    path: '/nftMarket',
+    name: 'NftMarket',
+    component: () => import('@/views/nftMarket.vue')
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: () => import('@/views/management/dashboard.vue')
+  },
+  {
+    path: '/myNft',
+    name: 'MyNft',
+    component: () => import('@/views/client/myNft.vue')
+  },
 ]
 
 const router = createRouter({
