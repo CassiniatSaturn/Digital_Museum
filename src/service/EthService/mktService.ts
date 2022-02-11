@@ -1,20 +1,12 @@
 import { nftContract, mktContract, digitalMuseum, web3 } from '@/Web3/web3/index'
-import { MarketItem } from '@/types/index'
+import { MarketItem, MetaItem } from '@/types/index'
 import { nftaddress } from '@/Web3/contracts/config'
-import { getTokenURI } from './nftService'
-import { fetchFromIpfs } from '../ipfsService'
+import {converURLToMeta} from '@/utils/convertURLToMeta'
 
 /* Reads unsold items list */
 async function fetchMarketItems(): Promise<MarketItem[]> {
-  const result: Array<MarketItem> = await mktContract.methods.fetchMarketItems().call({ from: digitalMuseum.from })
-  result.map(async (i) => {
-    const uri = await getTokenURI(i.tokenId)
-    console.log(uri);
-    const metadata = await fetchFromIpfs(uri)
-    console.log(JSON.parse(metadata as unknown as string));
-    
-  })
-  console.log(result);
+  const itemsList: Array<MarketItem> = await mktContract.methods.fetchMarketItems().call({ from: digitalMuseum.from })
+  const result = await converURLToMeta(itemsList)
   return result
 }
 
@@ -39,16 +31,18 @@ async function createMktItem(price: number, url: string) {
 
 /* Reads items created by me */
 async function fetchItemsCreated(): Promise<MarketItem[]> {
-  const result: Array<MarketItem> = await mktContract.methods.fetchItemsCreated().call({ from: digitalMuseum.from })
+  const itemsList: Array<MarketItem> = await mktContract.methods.fetchItemsCreated().call({ from: digitalMuseum.from })
+  const result = await converURLToMeta(itemsList)
   console.log(result);
+  
   return result
 }
 
 
 /* Reads my items */
 async function fetchMyNFTs(account: string): Promise<MarketItem[]> {
-  const result: Array<MarketItem> = await mktContract.methods.fetchMyNFTs().call({ from: account })
-  console.log(result);
+  const itemsList: Array<MarketItem> = await mktContract.methods.fetchMyNFTs().call({ from: account })
+  const result = await converURLToMeta(itemsList)
   return result
 }
 

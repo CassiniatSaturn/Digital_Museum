@@ -31,5 +31,15 @@ export interface MarketItem{
   itemId?:string,
   nftContractAdd:string,
   tokenId:string,
-  price:string
+  price:string,
+  info?:MetaItem
 }
+
+export interface MetaItem{
+  name:string,
+  description:string,
+  image:string
+}
+
+
+

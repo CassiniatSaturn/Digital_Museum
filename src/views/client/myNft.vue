@@ -1,6 +1,14 @@
 <template>
   <div>
-    <div v-for="item in state.nftList" :key="item.itemId">{{ item }}</div>
+    <div>
+      <div v-for="item in state.nftList" :key="item.itemId">
+        <div>{{ item.info?.name }}</div>
+        <div>{{ item.info?.description }}</div>
+        <div>
+          <img :src="item.info?.image" />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

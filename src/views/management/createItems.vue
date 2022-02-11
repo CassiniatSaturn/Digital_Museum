@@ -31,20 +31,16 @@
 <script setup lang="ts">
 import { createMktItem } from "@/service/EthService/mktService"
 import { ref, onMounted, reactive, computed, toRefs } from "vue";
-import { fetchFromIpfs, getFileUrl } from "@/service/ipfsService";
-import { Collection } from "@/types";
-import { Upload } from "ant-design-vue";
-import { message } from "ant-design-vue";
+import { getFileUrl } from "@/service/ipfsService";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons-vue";
 import * as ipfs_core from "ipfs-core";
 import { IPFS } from "ipfs-core-types";
 
 /* create the instance of ipfs */
 let ipfs = {} as IPFS;
-
-(async () => {
+onMounted(async()=>{
   ipfs = await ipfs_core.create();
-})();
+})
 
 /* Creates a market item */
 const itemName = ref("");
@@ -67,7 +63,7 @@ const createItem = async () => {
       url.value = getFileUrl(dataHash)
     })
     .then(async () => {
-      /* uoload to Ethereum */
+      /* upload to Ethereum */
       await createMktItem(price.value, url.value)
     });
 

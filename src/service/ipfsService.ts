@@ -1,7 +1,6 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
-import * as ipfs_core from 'ipfs-core'
 
-const baseURL = 'https://ipfs.io/ipfs'
+export const baseURL = 'https://ipfs.io/ipfs'
 const ipfsAxios = axios.create({
   baseURL: baseURL,
 })
@@ -20,12 +19,13 @@ export default <T = any>(config: AxiosRequestConfig) => {
   }) as unknown) as Promise<iRet>
 }
 
-export function fetchFromIpfs(hash: string) {
+export function fetchFromIpfs(hash?: string) {
   return ipfsAxios({
     url: '/' + hash,
     method: 'get',
   })
 }
+
 export function getFileUrl(hash: string) {
   return baseURL + '/' + hash
 }

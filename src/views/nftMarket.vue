@@ -1,7 +1,11 @@
 <template>
   <div>
     <div v-for="item in state.itemList" :key="item.itemId">
-      <div>{{ item }}</div>
+      <div>{{ item.info?.name }}</div>
+      <div>{{item.info?.description}}</div>
+      <div>
+        <img :src="item.info?.image" alt="">
+      </div>
       <div>
         <button type="button" @click="purchaseNFT(item.itemId!,item.price)">purchase</button>
       </div>
