@@ -1,42 +1,41 @@
 <template>
   <div>
-    <div v-for="item in state.itemList" :key="item.itemId">
+    <div v-for="item in state.itemList" :key="item.itemId" @click="goToDetail(item.itemId)">
       <div>{{ item.info?.name }}</div>
-      <div>{{item.info?.description}}</div>
+      <div>{{ item.info?.description }}</div>
+      <div>status:{{ item.status }}</div>
       <div>
-        <img :src="item.info?.image" alt="">
-      </div>
-      <div>
-        <button type="button" @click="purchaseNFT(item.itemId!,item.price)">purchase</button>
+        <img :src="item.info?.image" />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { fetchMarketItems, createMarketSale } from '@/service/EthService/mktService';
+import { fetchMarketItems, createMarketSale, createBid, endAuction } from '@/service/EthService/mktService';
 import { MarketItem } from '@/types';
 import { onMounted, reactive, ref } from 'vue';
 import { web3 } from '@/Web3/web3';
-
+import { ItemStatus } from '@/types';
+import { useRouter } from 'vue-router';
 const state = reactive({ itemList: [] as Array<MarketItem> })
 const currentAccount = ref('')
 
 onMounted(async () => {
   try {
-    web3.eth.getAccounts().then((accounts) => {
-      currentAccount.value = accounts[0]
-    })
+    currentAccount.value = (await web3.eth.getAccounts())[0]
+    console.log(currentAccount.value);
+
+    state.itemList = await fetchMarketItems(currentAccount.value)
+    console.log(state.itemList);
   } catch (error) {
     console.log(error);
   }
-  state.itemList = await fetchMarketItems()
-  console.log(state.itemList);
 })
 
-/* Buys NFT */
-
-const purchaseNFT = async (itemId: string, price: string) => {
-  await createMarketSale(itemId, currentAccount.value, price)
+/* check the detail */
+const router = useRouter()
+const goToDetail = (itemId: string) => {
+  router.push({ name: 'NFTDetail', query: { id: itemId } })
 }
 </script>

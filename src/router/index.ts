@@ -27,9 +27,19 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/management/dashboard.vue')
   },
   {
+    path: '/setItemStatus',
+    name: 'SetItemStatus',
+    component: () => import('@/views/management/setItemStatus.vue')
+  },
+  {
     path: '/myNft',
     name: 'MyNft',
     component: () => import('@/views/client/myNft.vue')
+  },
+  {
+    path: '/nftDetail',
+    name: 'NFTDetail',
+    component: () => import('@/views/nftDetail.vue')
   },
 ]
 

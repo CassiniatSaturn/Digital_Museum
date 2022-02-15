@@ -1,11 +1,13 @@
 import { nftContract, mktContract, digitalMuseum, web3 } from '@/Web3/web3/index'
-import { MarketItem, MetaItem } from '@/types/index'
+import { Auction, MarketItem, MetaItem } from '@/types/index'
 import { nftaddress } from '@/Web3/contracts/config'
 import {converURLToMeta} from '@/utils/convertURLToMeta'
 
 /* Reads unsold items list */
-async function fetchMarketItems(): Promise<MarketItem[]> {
-  const itemsList: Array<MarketItem> = await mktContract.methods.fetchMarketItems().call({ from: digitalMuseum.from })
+async function fetchMarketItems(account:string): Promise<MarketItem[]> {
+  const itemsList: Array<MarketItem> = await mktContract.methods.fetchMarketItems().call({ from: account })
+  console.log(itemsList);
+  
   const result = await converURLToMeta(itemsList)
   return result
 }
@@ -17,16 +19,27 @@ async function getListingPrice(): Promise<string> {
 }
 
 /* Creates items */
-async function createMktItem(price: number, url: string) {
+async function createMktItem(url: string) {
   const transaction1 = await nftContract.methods.forge(url).send({ from: digitalMuseum.from })
   const tokenID = transaction1.events.Transfer.returnValues.tokenId
-  const parsedPrice = web3.utils.toBN(price)
+  console.log(tokenID);
+  
 
   const listingPrice = await getListingPrice()
-  const transaction2 = await mktContract.methods.createMarketItem(nftaddress, tokenID, parsedPrice).send({ from: digitalMuseum.from, value: listingPrice })
-  console.log(transaction2);
-
+  const transaction2 = await mktContract.methods.createMarketItem(nftaddress, tokenID).send({ from: digitalMuseum.from, value: listingPrice })
   return tokenID
+}
+
+
+/* Sell item in a fixed price */
+async function setFixedPrice(itemId:string,price:number) {
+  const parsedPrice = web3.utils.toBN(price)
+  await mktContract.methods.setFixedPrice(itemId,parsedPrice).send({ from: digitalMuseum.from })
+}
+
+/* Sell item on auction */
+async function createAuction(itemId:string,duration:number,reservePrice:number) {
+  await mktContract.methods.createAuction(itemId,duration,reservePrice).send({ from: digitalMuseum.from })
 }
 
 /* Reads items created by me */
@@ -37,7 +50,6 @@ async function fetchItemsCreated(): Promise<MarketItem[]> {
   
   return result
 }
-
 
 /* Reads my items */
 async function fetchMyNFTs(account: string): Promise<MarketItem[]> {
@@ -54,10 +66,50 @@ async function createMarketSale(itemId: string, account: string, price: string) 
 
 }
 
+/* Creates bid */
+async function createBid(itemId:string,amount:string,account:string){
+  const parsedPrice = web3.utils.toWei(amount)
+  await mktContract.methods.createBid(itemId, amount).send({ from: account, value: parsedPrice })
+}
+
+async function endAuction(itemId:string,account:string) {
+  await mktContract.methods.endAuction(itemId, nftaddress).send({ from: account})
+}
+
+
+async function cancelAuction(itemId:string) {
+  await mktContract.methods.cancelAuction(itemId).send({ from: digitalMuseum.address})
+}
+
+async function auctionEnds(itemId:string,account:string):Promise<string> {
+  const endsTime = await mktContract.methods.auctionEnds(itemId).call({ from: account})
+  return endsTime
+}
+
+async function fetchMarketItemDetail(itemId:string,account:string):Promise<MarketItem> {
+  const item:MarketItem = await mktContract.methods.fetchMarketItemDetail(itemId).call({ from: account})
+  const result = await converURLToMeta([item])
+  return result[0]
+}
+
+
+async function fetchAuction(itemId:string,account:string):Promise<Auction>{
+  const result = await mktContract.methods.fetchAuction(itemId).call({ from: account})
+  return result
+}
+
 export {
   fetchMarketItems,
   createMktItem,
   fetchItemsCreated,
   fetchMyNFTs,
-  createMarketSale
+  createMarketSale,
+  createBid,
+  endAuction,
+  cancelAuction,
+  setFixedPrice,
+  createAuction,
+  auctionEnds,
+  fetchMarketItemDetail,
+  fetchAuction
 }

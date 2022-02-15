@@ -20,8 +20,6 @@
     </a-upload>
     <div>Name</div>
     <input type="text" placeholder="please enter the name" v-model="itemName" />
-    <div>Price</div>
-    <input type="text" placeholder="please enter the price" v-model="price" />
     <div>Description</div>
     <input type="text" placeholder="please enter the ipfs hash" v-model="description" />
     <button @click="createItem">创建</button>
@@ -45,11 +43,10 @@ onMounted(async()=>{
 /* Creates a market item */
 const itemName = ref("");
 const description = ref("");
-const price = ref(0)
 const url = ref('')
 
 const createItem = async () => {
-  if (!itemName.value || !description.value || !price.value || !imageUrl.value) return
+  if (!itemName.value || !description.value || !imageUrl.value) return
   /* first, upload to IPFS */
   const data = JSON.stringify({
     name: itemName.value, description: description.value, image: imageUrl.value
@@ -64,7 +61,7 @@ const createItem = async () => {
     })
     .then(async () => {
       /* upload to Ethereum */
-      await createMktItem(price.value, url.value)
+      await createMktItem(url.value)
     });
 
 };

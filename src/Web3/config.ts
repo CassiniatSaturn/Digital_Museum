@@ -1,5 +1,5 @@
 
-  export const digitalmuseumaddress = "0x5D550687dDe58F967062DbC384D4990dbb050d9B"
-  export const marketaddress =  "0xeC2Aa82647008e9d7052357571A7284feb82846D"
-  export const nftaddress = "0xF928AAe65999eb25A55D145C0887bC915B6Cb9b3"
+  export const digitalmuseumaddress = "0x000edBAB7Bd55f93916EC52d7F0f8401c157264D"
+  export const marketaddress =  "0x9E64af8fB9260Cdf763D2541192b73208F24a221"
+  export const nftaddress = "0x820f83cB6FB084c6c456f5b5016fF80bdE845432"
   
