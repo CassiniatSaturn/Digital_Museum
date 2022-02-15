@@ -45,6 +45,11 @@ contract Market is ReentrancyGuard {
     /* map the itemId to the Item */
     mapping(uint256 => MarketItem) private idToMktItem;
 
+    /* Returns the detail of Item */
+    function fetchMarketItemDetail(uint256 _itemId) public view returns(MarketItem memory){
+        return idToMktItem[_itemId];
+    }
+
     /* Returns the listing price of the contract */
     function getListingPrice() public view returns (uint256) {
         return listingPrice;
@@ -93,21 +98,21 @@ contract Market is ReentrancyGuard {
         );
     }
 
+    /* Sets fixed price to sell */
     function setFixedPrice(uint256 _itemId, uint256 _price) public {
         require(idToMktItem[_itemId].status == Status.New);
         idToMktItem[_itemId].status = Status.BuyNow;
         idToMktItem[_itemId].price = _price;
     }
 
-    // Creates Auction
-
+    /* Creates Auction */
     function createAuction(
         uint256 itemId,
         uint256 duration,
-        uint256 reservePrice,
-        address contractAdd
+        uint256 reservePrice
     ) public payable nonReentrant auctionNonExistant(itemId) {
         require(idToMktItem[itemId].status == Status.New);
+        idToMktItem[itemId].status = Status.OnAuction;
         // Initialize the auction details, including null values.
         auctions[itemId] = Auction({
             duration: duration,
@@ -117,10 +122,7 @@ contract Market is ReentrancyGuard {
             firstBidTime: 0,
             bidder: payable(address(0))
         });
-
-        // Transfer the NFT into this auction contract, from whoever owns it.
         uint256 tokenId = idToMktItem[itemId].tokenId;
-        IERC721(contractAdd).transferFrom(msg.sender, address(this), tokenId);
         // Emit an event describing the new auction.
         emit AuctionCreated(tokenId, duration, reservePrice);
     }
@@ -154,12 +156,22 @@ contract Market is ReentrancyGuard {
     /* Returns all unsold market items */
     function fetchMarketItems() public view returns (MarketItem[] memory) {
         uint256 totalItems = _itemIds.current();
-        uint256 unsoldItemsCount = _itemIds.current() - _itemsSold.current();
+        uint256 unsoldItemsCount = 0;
         uint256 currenIndex = 0;
+
+        for (uint256 i = 1; i <= totalItems; i++) {
+            if (idToMktItem[i].status == Status.BuyNow ||
+                idToMktItem[i].status == Status.OnAuction) {
+                unsoldItemsCount += 1;
+            }
+        }
 
         MarketItem[] memory items = new MarketItem[](unsoldItemsCount);
         for (uint256 i = 1; i <= totalItems; i++) {
-            if (idToMktItem[i].owner == address(0)) {
+            if (
+                idToMktItem[i].status == Status.BuyNow ||
+                idToMktItem[i].status == Status.OnAuction
+            ) {
                 MarketItem storage currentItem = idToMktItem[i];
                 items[currenIndex] = currentItem;
                 currenIndex = currenIndex + 1;
@@ -168,7 +180,7 @@ contract Market is ReentrancyGuard {
         return items;
     }
 
-    /* Returns onlyl items that a user has purchased */
+    /* Returns items purchased */
     function fetchMyNFTs() public view returns (MarketItem[] memory) {
         uint256 totalItems = _itemIds.current();
         uint256 currenIndex = 0;
@@ -313,8 +325,12 @@ contract Market is ReentrancyGuard {
         _;
     }
 
-    // ============ Create Bid ============
+    /* fetch the detail from auctions */
+    function fetchAuction(uint256 itemId) public view returns(Auction memory){
+        return auctions[itemId];
+    }
 
+    // ============ Create Bid ============
     function createBid(uint256 itemId, uint256 amount)
         public
         payable
@@ -322,8 +338,13 @@ contract Market is ReentrancyGuard {
         auctionExists(itemId)
         auctionNotExpired(itemId)
     {
+        // The creator can't create bid
+        require(msg.sender != owner, "The owner can't create a bid");
         // Validate that the user's expected bid value matches the ETH deposit.
-        require(amount == msg.value / (1 ether), "Amount doesn't equal msg.value");
+        require(
+            amount == msg.value / (1 ether),
+            "Amount doesn't equal msg.value"
+        );
         require(amount > 0, "Amount must be greater than 0");
         // Check if the current bid amount is 0.
         if (auctions[itemId].amount == 0) {
@@ -346,8 +367,7 @@ contract Market is ReentrancyGuard {
                             .amount
                             .mul(MIN_BID_INCREMENT_PERCENT)
                             .div(100)
-                    ) /
-                        (1 ether),
+                    ) ,
                 "Must bid more than last bid by MIN_BID_INCREMENT_PERCENT amount"
             );
 
@@ -378,7 +398,10 @@ contract Market is ReentrancyGuard {
         auctionComplete(itemId)
     {
         require(auctions[itemId].amount != 0, "This item is not on auction");
-        require(msg.sender ==  auctions[itemId].bidder, "Only the bidder can end auction");
+        require(
+            msg.sender == auctions[itemId].bidder || msg.sender == owner,
+            "Only bidder or owner can end auction"
+        );
         // Store relevant auction data in memory for the life of this function.
         address winner = auctions[itemId].bidder;
         uint256 amount = auctions[itemId].amount;
@@ -403,6 +426,11 @@ contract Market is ReentrancyGuard {
         nonReentrant
         auctionExists(_itemId)
     {
+        // Only owner can cancel auction
+        require(
+            msg.sender == owner,
+            "You're not the owner"
+        );
         // Check that there hasn't already been a bid for this NFT.
         require(
             uint256(auctions[_itemId].firstBidTime) == 0,
@@ -422,7 +450,7 @@ contract Market is ReentrancyGuard {
     }
 
     // Returns the timestamp at which an auction will finish.
-    function auctionEnds(uint256 itemId) private view returns (uint256) {
+    function auctionEnds(uint256 itemId) public view returns (uint256) {
         // Derived by adding the auction's duration to the time of the first bid.
         // NOTE: duration can be extended conditionally after each new bid is added.
         return auctions[itemId].firstBidTime.add(auctions[itemId].duration);
