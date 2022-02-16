@@ -46,7 +46,11 @@ contract Market is ReentrancyGuard {
     mapping(uint256 => MarketItem) private idToMktItem;
 
     /* Returns the detail of Item */
-    function fetchMarketItemDetail(uint256 _itemId) public view returns(MarketItem memory){
+    function fetchMarketItemDetail(uint256 _itemId)
+        public
+        view
+        returns (MarketItem memory)
+    {
         return idToMktItem[_itemId];
     }
 
@@ -160,8 +164,10 @@ contract Market is ReentrancyGuard {
         uint256 currenIndex = 0;
 
         for (uint256 i = 1; i <= totalItems; i++) {
-            if (idToMktItem[i].status == Status.BuyNow ||
-                idToMktItem[i].status == Status.OnAuction) {
+            if (
+                idToMktItem[i].status == Status.BuyNow ||
+                idToMktItem[i].status == Status.OnAuction
+            ) {
                 unsoldItemsCount += 1;
             }
         }
@@ -326,7 +332,7 @@ contract Market is ReentrancyGuard {
     }
 
     /* fetch the detail from auctions */
-    function fetchAuction(uint256 itemId) public view returns(Auction memory){
+    function fetchAuction(uint256 itemId) public view returns (Auction memory) {
         return auctions[itemId];
     }
 
@@ -359,20 +365,27 @@ contract Market is ReentrancyGuard {
         } else {
             // Check that the new bid is sufficiently higher than the previous bid, by
             // the percentage defined as MIN_BID_INCREMENT_PERCENT.
+            //convert ether to wei to avoid the demical
+            uint256 parsedAmount = amount.mul(1 ether);
+            uint256 parsedFormerAmount = auctions[itemId].amount.mul(1 ether);
+
             require(
-                amount >=
-                    auctions[itemId].amount.add(
+                parsedAmount >=
+                    parsedFormerAmount.add(
                         // Add 10% of the current bid to the current bid.
-                        auctions[itemId]
-                            .amount
-                            .mul(MIN_BID_INCREMENT_PERCENT)
-                            .div(100)
-                    ) ,
+                        parsedFormerAmount.mul(MIN_BID_INCREMENT_PERCENT).div(
+                            100
+                        )
+                    ),
                 "Must bid more than last bid by MIN_BID_INCREMENT_PERCENT amount"
             );
 
             // Refund the previous bidder.
-            auctions[itemId].bidder.transfer(auctions[itemId].amount);
+            bool result = attemptETHTransfer(
+                auctions[itemId].bidder,
+                parsedFormerAmount
+            );
+            require(result,'Fail to refund');
         }
         // Update the current auction.
         auctions[itemId].amount = amount;
@@ -388,6 +401,21 @@ contract Market is ReentrancyGuard {
         }
         // Emit the event that a bid has been made.
         emit AuctionBid(itemId, msg.sender, amount);
+    }
+
+    // Sending ETH is not guaranteed complete, and the method used here will return false if
+    // it fails. For example, a contract can block ETH transfer, or might use
+    // an excessive amount of gas, thereby griefing a new bidder.
+    // We should limit the gas used in transfers, and handle failure cases.
+    function attemptETHTransfer(address to, uint256 value)
+        private
+        returns (bool)
+    {
+        // Here increase the gas limit a reasonable amount above the default, and try
+        // to send ETH to the recipient.
+        // NOTE: This might allow the recipient to attempt a limited reentrancy attack.
+        (bool success, ) = to.call{value: value, gas: 30000}("");
+        return success;
     }
 
     // ============ End Auction ============
@@ -427,10 +455,7 @@ contract Market is ReentrancyGuard {
         auctionExists(_itemId)
     {
         // Only owner can cancel auction
-        require(
-            msg.sender == owner,
-            "You're not the owner"
-        );
+        require(msg.sender == owner, "You're not the owner");
         // Check that there hasn't already been a bid for this NFT.
         require(
             uint256(auctions[_itemId].firstBidTime) == 0,
