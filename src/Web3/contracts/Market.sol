@@ -12,8 +12,6 @@ contract Market is ReentrancyGuard {
     Counters.Counter private _itemsSold;
 
     address payable owner;
-    /* service fee */
-    uint256 listingPrice = 0.025 ether;
 
     constructor() {
         owner = payable(msg.sender);
@@ -54,9 +52,11 @@ contract Market is ReentrancyGuard {
         return idToMktItem[_itemId];
     }
 
-    /* Returns the listing price of the contract */
-    function getListingPrice() public view returns (uint256) {
-        return listingPrice;
+    /* Reverts if the transaction is not sent by the owner */
+    modifier isOwner() {
+        // The auction exists if the curator is not null.
+        require(msg.sender == owner, "You are not the owner");
+        _;
     }
 
     /* Places an nft to the market */
@@ -73,11 +73,8 @@ contract Market is ReentrancyGuard {
         public
         payable
         nonReentrant
+        isOwner
     {
-        require(
-            msg.value == listingPrice,
-            "Price must be equal to listing price"
-        );
         _itemIds.increment();
         uint256 itemId = _itemIds.current();
 
@@ -102,8 +99,23 @@ contract Market is ReentrancyGuard {
         );
     }
 
+    event MarketItemRemoved(uint256 indexed itemId, uint256 indexed tokenId);
+
+    /* Remove Item from mkt */
+    function removeItem(uint256 _itemId) public isOwner {
+        /* if the item is on auction and the auction starts, it can't be removed*/
+        if (idToMktItem[_itemId].status == Status.OnAuction) {
+            require(
+                auctions[_itemId].bidder == address(0),
+                "The auction starts!"
+            );
+        }
+        emit MarketItemRemoved(_itemId, idToMktItem[_itemId].tokenId);
+        delete idToMktItem[_itemId];
+    }
+
     /* Sets fixed price to sell */
-    function setFixedPrice(uint256 _itemId, uint256 _price) public {
+    function setFixedPrice(uint256 _itemId, uint256 _price) public isOwner {
         require(idToMktItem[_itemId].status == Status.New);
         idToMktItem[_itemId].status = Status.BuyNow;
         idToMktItem[_itemId].price = _price;
@@ -114,7 +126,7 @@ contract Market is ReentrancyGuard {
         uint256 itemId,
         uint256 duration,
         uint256 reservePrice
-    ) public payable nonReentrant auctionNonExistant(itemId) {
+    ) public payable nonReentrant auctionNonExistant(itemId) isOwner {
         require(idToMktItem[itemId].status == Status.New);
         idToMktItem[itemId].status = Status.OnAuction;
         // Initialize the auction details, including null values.
@@ -137,6 +149,7 @@ contract Market is ReentrancyGuard {
         public
         payable
         nonReentrant
+        isOwner
     {
         uint256 price = idToMktItem[itemId].price;
         uint256 tokenId = idToMktItem[itemId].tokenId;
@@ -154,7 +167,6 @@ contract Market is ReentrancyGuard {
         idToMktItem[itemId].owner = payable(msg.sender);
         idToMktItem[itemId].status = Status.Sold;
         _itemsSold.increment();
-        payable(owner).transfer(listingPrice);
     }
 
     /* Returns all unsold market items */
@@ -164,23 +176,29 @@ contract Market is ReentrancyGuard {
         uint256 currenIndex = 0;
 
         for (uint256 i = 1; i <= totalItems; i++) {
-            if (
-                idToMktItem[i].status == Status.BuyNow ||
-                idToMktItem[i].status == Status.OnAuction
-            ) {
-                unsoldItemsCount += 1;
+            /* if the item exsit */
+            if (idToMktItem[i].seller != address(0)) {
+                /* Only set the status in BUYNOW or ONAUCTION can be listed */
+                if (
+                    idToMktItem[i].status == Status.BuyNow ||
+                    idToMktItem[i].status == Status.OnAuction
+                ) {
+                    unsoldItemsCount += 1;
+                }
             }
         }
 
         MarketItem[] memory items = new MarketItem[](unsoldItemsCount);
         for (uint256 i = 1; i <= totalItems; i++) {
-            if (
-                idToMktItem[i].status == Status.BuyNow ||
-                idToMktItem[i].status == Status.OnAuction
-            ) {
-                MarketItem storage currentItem = idToMktItem[i];
-                items[currenIndex] = currentItem;
-                currenIndex = currenIndex + 1;
+            if (idToMktItem[i].seller != address(0)) {
+                if (
+                    idToMktItem[i].status == Status.BuyNow ||
+                    idToMktItem[i].status == Status.OnAuction
+                ) {
+                    MarketItem storage currentItem = idToMktItem[i];
+                    items[currenIndex] = currentItem;
+                    currenIndex = currenIndex + 1;
+                }
             }
         }
         return items;
@@ -210,7 +228,12 @@ contract Market is ReentrancyGuard {
     }
 
     /* Returns only items a user has created */
-    function fetchItemsCreated() public view returns (MarketItem[] memory) {
+    function fetchItemsCreated()
+        public
+        view
+        isOwner
+        returns (MarketItem[] memory)
+    {
         uint256 totalItems = _itemIds.current();
         uint256 currenIndex = 0;
         uint256 createdItemsCount = 0;
@@ -344,8 +367,6 @@ contract Market is ReentrancyGuard {
         auctionExists(itemId)
         auctionNotExpired(itemId)
     {
-        // The creator can't create bid
-        require(msg.sender != owner, "The owner can't create a bid");
         // Validate that the user's expected bid value matches the ETH deposit.
         require(
             amount == msg.value / (1 ether),
@@ -385,7 +406,7 @@ contract Market is ReentrancyGuard {
                 auctions[itemId].bidder,
                 parsedFormerAmount
             );
-            require(result,'Fail to refund');
+            require(result, "Fail to refund");
         }
         // Update the current auction.
         auctions[itemId].amount = amount;
@@ -452,10 +473,9 @@ contract Market is ReentrancyGuard {
     function cancelAuction(uint256 _itemId)
         public
         nonReentrant
+        isOwner
         auctionExists(_itemId)
     {
-        // Only owner can cancel auction
-        require(msg.sender == owner, "You're not the owner");
         // Check that there hasn't already been a bid for this NFT.
         require(
             uint256(auctions[_itemId].firstBidTime) == 0,
@@ -463,6 +483,8 @@ contract Market is ReentrancyGuard {
         );
         // Remove all data about the auction.
         delete auctions[_itemId];
+        // Switch the status of the item to NEW
+        idToMktItem[_itemId].status = Status.New;
         // Emit an event describing that the auction has been canceled.
         emit AuctionCanceled(_itemId);
     }

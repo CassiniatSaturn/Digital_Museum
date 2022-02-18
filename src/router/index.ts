@@ -7,6 +7,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/index.vue')
   },
   {
+    path: '/nftMarket',
+    name: 'NftMarket',
+    component: () => import('@/views/nftMarket.vue')
+  },
+  {
     path: '/create',
     name: 'CreateCollection',
     component: () => import('@/views/management/Index.vue')
@@ -17,11 +22,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/management/createItems.vue')
   },
   {
-    path: '/nftMarket',
-    name: 'NftMarket',
-    component: () => import('@/views/nftMarket.vue')
-  },
-  {
     path: '/dashboard',
     name: 'Dashboard',
     component: () => import('@/views/management/dashboard.vue')
@@ -30,6 +30,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/setItemStatus',
     name: 'SetItemStatus',
     component: () => import('@/views/management/setItemStatus.vue')
+  },
+  {
+    path: '/manageCollections',
+    name: 'ManageCollections',
+    component: () => import('@/views/management/manageCollections.vue')
   },
   {
     path: '/myNft',

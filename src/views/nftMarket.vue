@@ -23,10 +23,13 @@ const currentAccount = ref('')
 
 onMounted(async () => {
   try {
-    currentAccount.value = (await web3.eth.getAccounts())[0]
+    const accounts = await web3.eth.getAccounts()
+    currentAccount.value = accounts[0]
     console.log(currentAccount.value);
-
-    state.itemList = await fetchMarketItems(currentAccount.value)
+    const list = await fetchMarketItems(currentAccount.value)
+    if (list) {
+      state.itemList = list
+    }
     console.log(state.itemList);
   } catch (error) {
     console.log(error);

@@ -5,6 +5,8 @@ import { fetchFromIpfs } from "@/service/ipfsService";
 
 export async function converURLToMeta(itemsList: Array<MarketItem>) {
   const result = await Promise.all(itemsList.map(async (i) => {
+    console.log(i);
+    
    return (
       async () => {
         const uri = await getTokenURI(i.tokenId)

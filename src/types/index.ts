@@ -1,12 +1,13 @@
 /* agree with the Collection Type in .sol file */
 export interface Collection {
-  id: number
+  id: string
   cName: string
   author: string
   detailHash: string
   imgHash: string
   dynasty: string
   genre: Category
+  curator?:string
 }
 export enum Category {
   jewelry,

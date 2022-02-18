@@ -22,8 +22,14 @@
       <div>endsTime{{ endsTime }}</div>
       <div>reservePrice{{ state.auction.reservePrice }}</div>
       <div>firstBidTime{{ state.auction.firstBidTime }}</div>
+      <button
+        v-if="state.auction.firstBidTime === '0'"
+        type="button"
+        @click="clickToCancle(state.nft.itemId)"
+      >cancel auction</button>
+      <br>
       <button type="button" @click="purchaseNFT(state.nft.status, state.nft.itemId)">bid for it</button>
-      <br/>
+      <br />
       <button @click="clickToEnd(state.nft.itemId!)">endAuction</button>
     </div>
     <a-modal title="Title" :visible="visible" @ok="offBid(bidItemId)" @cancel="visible = false">
@@ -38,7 +44,7 @@ import { useRoute } from 'vue-router';
 import { web3 } from '@/Web3/web3';
 import { MarketItem, ItemStatus, Auction } from '@/types'
 import { fetchMarketItemDetail, fetchAuction } from "@/service/EthService/mktService"
-import { fetchMarketItems, createMarketSale, createBid, endAuction,auctionEnds } from '@/service/EthService/mktService';
+import { fetchMarketItems, createMarketSale, createBid, endAuction, auctionEnds,cancelAuction } from '@/service/EthService/mktService';
 
 /* fetch info of NFT */
 const state = reactive({ nft: {} as MarketItem, auction: {} as Auction })
@@ -57,9 +63,9 @@ onMounted(async () => {
     if (state.nft.status == ItemStatus.OnAuction) {
       state.auction = await fetchAuction(currenItemId.value, currentAccount.value)
       console.log(state.auction);
-      endsTime.value = await auctionEnds(currenItemId.value,currentAccount.value)
+      endsTime.value = await auctionEnds(currenItemId.value, currentAccount.value)
       console.log(endsTime.value);
-      
+
     }
   } catch (error) {
     console.log(error);
@@ -92,5 +98,10 @@ const purchaseNFT = async (status: ItemStatus, itemId: string, price?: string) =
 /* claim nft */
 const clickToEnd = async (itemId: string) => {
   await endAuction(itemId, currentAccount.value)
+}
+
+/* cancel auction */
+const clickToCancle = async (itemId: string) => {
+  await cancelAuction(itemId)
 }
 </script>

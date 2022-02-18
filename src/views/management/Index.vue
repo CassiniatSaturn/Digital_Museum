@@ -58,12 +58,12 @@ import { IPFS } from "ipfs-core-types";
 import classes from "@/assets/css/style.module.css"
 
 const myClass = ref(classes)
+
 /* create the instance of ipfs */
 let ipfs = {} as IPFS;
-
-(async () => {
+onMounted(async()=>{
   ipfs = await ipfs_core.create();
-})();
+})
 
 /* create a collection */
 const cName = ref("");
