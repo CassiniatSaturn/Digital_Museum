@@ -1,6 +1,6 @@
 import { nftContract, mktContract, digitalMuseum, web3 } from '@/Web3/web3/index'
 import { Auction, MarketItem, MetaItem } from '@/types/index'
-import { nftaddress } from '@/Web3/contracts/config'
+import { nftaddress } from '@/Web3/config'
 import { converURLToMeta } from '@/utils/convertURLToMeta'
 
 /* Reads unsold items list */
@@ -99,6 +99,18 @@ async function fetchAuction(itemId: string, account: string): Promise<Auction> {
   return result
 }
 
+async function verifyAuction(account:string){
+  const result = await mktContract.getPastEvents('AuctionBid',{
+    filter:{
+      sender:[account]
+    }
+  })
+  if(result[0]){
+    /* query my bid amount */
+    console.log(result[0]);
+  }
+}
+
 export {
   fetchMarketItems,
   createMktItem,
@@ -113,5 +125,6 @@ export {
   createAuction,
   auctionEnds,
   fetchMarketItemDetail,
-  fetchAuction
+  fetchAuction,
+  verifyAuction
 }

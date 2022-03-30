@@ -149,7 +149,6 @@ contract Market is ReentrancyGuard {
         public
         payable
         nonReentrant
-        isOwner
     {
         uint256 price = idToMktItem[itemId].price;
         uint256 tokenId = idToMktItem[itemId].tokenId;
@@ -303,7 +302,11 @@ contract Market is ReentrancyGuard {
 
     // All of the details of a new bid,
     // with an index created for the tokenId.
-    event AuctionBid(uint256 indexed tokenId, address sender, uint256 value);
+    event AuctionBid(
+        uint256 indexed tokenId,
+        address indexed sender,
+        uint256 value
+    );
 
     // All of the details of an auction's cancelation,
     // with an index created for the tokenId.
@@ -311,7 +314,11 @@ contract Market is ReentrancyGuard {
 
     // All of the details of an auction's close,
     // with an index created for the tokenId.
-    event AuctionEnded(uint256 indexed tokenId, address winner, uint256 amount);
+    event AuctionEnded(
+        uint256 indexed tokenId,
+        address indexed winner,
+        uint256 amount
+    );
 
     // ============ Modifiers ============
 
@@ -460,6 +467,13 @@ contract Market is ReentrancyGuard {
         // which would break the auction.
         uint256 tokenId = idToMktItem[itemId].tokenId;
         IERC721(nftContract).transferFrom(address(this), winner, tokenId);
+        // Transfer the ETH to curator.
+        uint256 parsedFormerAmount = auctions[itemId].amount.mul(1 ether);
+        bool result = attemptETHTransfer(
+            auctions[itemId].curator,
+            parsedFormerAmount
+        );
+        require(result, "Fail to transfer");
         idToMktItem[itemId].owner = payable(winner);
         idToMktItem[itemId].status = Status.Sold;
         idToMktItem[itemId].price = amount;

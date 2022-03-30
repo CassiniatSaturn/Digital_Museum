@@ -81,17 +81,22 @@ const createNewCollection = async () => {
     .add(description.value)
     .then((result) => {
       desHash.value = result.path;
-      console.log(desHash.value);
     })
     .then(async () => {
       /* uoload to Ethereum */
+      const meta = {date:new Date().getTime(),recorder:'zhangsan',id:'01',level:'1'};
+      const metaJSON = JSON.stringify(meta)
+      const result = await ipfs.add(metaJSON)
+      console.log(result);
+      
       await createCollection(
         cName.value,
         author.value,
         desHash.value,
         imgHash.value,
         dynasty.value,
-        type.value
+        type.value,
+        result.path
       );
     });
   await fetchCollections();

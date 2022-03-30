@@ -3,7 +3,7 @@ import DigitalMuseum from '../build/contracts/DigitalMuseum.json'
 import Market from '../build/contracts/Market.json'
 import NFT from '../build/contracts/NFT.json'
 import { AbiItem } from 'web3-utils';
-import { digitalmuseumaddress, marketaddress, nftaddress } from '../contracts/config'
+import { digitalmuseumaddress, marketaddress, nftaddress } from '../config'
 
 /* Creates web3 service*/
 let web3 = new Web3()

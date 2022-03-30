@@ -46,6 +46,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'NFTDetail',
     component: () => import('@/views/nftDetail.vue')
   },
+  {
+    path: '/Crypto',
+    name: 'Crypto',
+    component: () => import('@/views/Crypto.vue')
+  },
 ]
 
 const router = createRouter({

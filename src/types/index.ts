@@ -1,5 +1,5 @@
 /* agree with the Collection Type in .sol file */
-export interface Collection {
+export interface Info{
   id: string
   cName: string
   author: string
@@ -7,7 +7,11 @@ export interface Collection {
   imgHash: string
   dynasty: string
   genre: Category
-  curator?:string
+  curator?:string,
+}
+export interface Collection {
+  info:Info,
+  metaURL:string
 }
 export enum Category {
   jewelry,

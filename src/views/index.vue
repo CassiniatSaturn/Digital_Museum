@@ -7,42 +7,42 @@
       <div>详情{{ item.detailHash }}</div>
       <div>朝代{{ item.dynasty }}</div>
       <img :src="getFileUrl(item.imgHash)" class="w-20" />
-      <!-- <q-chip clickable color="red" text-color="white" @click="handleFavor(item.id)" icon="favorite">收藏</q-chip> -->
+      <!-- <div>{{ item.metaURL }}</div> -->
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { getCollections,toggleFavor } from "@/service/EthService/museumService";
+import { getCollections, toggleFavor } from "@/service/EthService/museumService";
 import { computed, onMounted } from "@vue/runtime-core";
 import { reactive, ref } from "vue";
-import { Collection } from "@/types";
+import { Collection,Info } from "@/types";
 import { fetchFromIpfs, getFileUrl } from "@/service/ipfsService";
 import { Category } from "@/types";
 import { web3 } from "@/Web3/web3";
 
 /* fetch collection list */
-let state = reactive({ collectionList: [] as Collection[] });
+let state = reactive({ collectionList: [] as Info[] });
 let imgUrl = ref("");
 let currentAccount = ref('')
 
 onMounted(async () => {
   currentAccount.value = (await web3.eth.getAccounts())[0]
   const list = await getCollections()
-  list.map((item: Collection) => {
-    const { id, cName, author, dynasty, genre, imgHash } = item;
-    let detailHash: string;
-    fetchFromIpfs(item.detailHash).then((res: any) => {
-      detailHash = res.data;
-      state.collectionList.push({
-        id,
-        author,
-        cName,
-        detailHash,
-        dynasty,
-        genre,
-        imgHash,
-      });
+  console.log(list);
+
+  list.map(async (item: Collection) => {
+    const { id, cName, author, dynasty, genre, imgHash } = item.info;
+    const res = await fetchFromIpfs(item.info.detailHash)
+    const detailHash = res.data
+    state.collectionList.push({
+      id,
+      author,
+      cName,
+      detailHash,
+      dynasty,
+      genre,
+      imgHash,
     });
   });
 })
@@ -59,8 +59,8 @@ const transGenre = (type: Category): string => {
 };
 
 /* add item to favorite list */
-const handleFavor = async(id: string) => {
-  await toggleFavor(id,currentAccount.value)
+const handleFavor = async (id: string) => {
+  await toggleFavor(id, currentAccount.value)
 };
 </script>
 

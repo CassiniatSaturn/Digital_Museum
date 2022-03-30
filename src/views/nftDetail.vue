@@ -19,7 +19,7 @@
     <div v-else-if="state.nft.status == ItemStatus.OnAuction">
       <div>amount{{ state.auction.amount }}</div>
       <div>bidder{{ state.auction.bidder }}</div>
-      <div>endsTime{{ endsTime }}</div>
+      <div>endsTime{{ dueTime }}</div>
       <div>reservePrice{{ state.auction.reservePrice }}</div>
       <div>firstBidTime{{ state.auction.firstBidTime }}</div>
       <button
@@ -35,6 +35,9 @@
     <a-modal title="Title" :visible="visible" @ok="offBid(bidItemId)" @cancel="visible = false">
       <input v-model="bid" />
     </a-modal>
+    <div>
+      <button type="button" @click="verifyMyBid">check my bid</button>
+    </div>
   </div>
 </template>
 
@@ -44,8 +47,8 @@ import { useRoute } from 'vue-router';
 import { web3 } from '@/Web3/web3';
 import { MarketItem, ItemStatus, Auction } from '@/types'
 import { fetchMarketItemDetail, fetchAuction } from "@/service/EthService/mktService"
-import { fetchMarketItems, createMarketSale, createBid, endAuction, auctionEnds,cancelAuction } from '@/service/EthService/mktService';
-
+import { fetchMarketItems, createMarketSale, createBid, endAuction, auctionEnds,cancelAuction,verifyAuction } from '@/service/EthService/mktService';
+import moment from 'moment';
 /* fetch info of NFT */
 const state = reactive({ nft: {} as MarketItem, auction: {} as Auction })
 const route = useRoute()
@@ -85,6 +88,9 @@ const offBid = async (itemId: string) => {
   }
 }
 
+const verifyMyBid = async()=>{
+  await verifyAuction(currentAccount.value)
+}
 const purchaseNFT = async (status: ItemStatus, itemId: string, price?: string) => {
   if (status == ItemStatus.BuyNow) {
     await createMarketSale(itemId, currentAccount.value, price!)
@@ -104,4 +110,8 @@ const clickToEnd = async (itemId: string) => {
 const clickToCancle = async (itemId: string) => {
   await cancelAuction(itemId)
 }
+
+const dueTime = computed(()=>{
+  return moment(parseInt(endsTime.value)*1000).format("dddd, MMMM Do YYYY, h:mm:ss a")
+})
 </script>

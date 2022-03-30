@@ -1,6 +1,5 @@
 import { museumContract, digitalMuseum } from '@/Web3/web3/index'
 import { Collection } from '@/types/index'
-import { digitalmuseumaddress, marketaddress, nftaddress } from '@/Web3/contracts/config'
 /* Read Collection List */
 async function getCollections(): Promise<Collection[]> {
   const result: Collection[] = await museumContract.methods.getCollections().call()
@@ -8,8 +7,8 @@ async function getCollections(): Promise<Collection[]> {
 }
 
 /* Creates collection */
-async function createCollection(cName:string,author:string,detailHash:string,imgHash:string,dynasty:string,type:number) {
-  await museumContract.methods.createCollection(cName,author,detailHash,imgHash,dynasty,type).send({ from: digitalMuseum.from})
+async function createCollection(cName:string,author:string,detailHash:string,imgHash:string,dynasty:string,type:number,metaURL:string) {
+  await museumContract.methods.createCollection(cName,author,detailHash,imgHash,dynasty,type,metaURL).send({ from: digitalMuseum.from})
 }
 
 /* Removes collection */

@@ -9,7 +9,7 @@ contract DigitalMuseum is ReentrancyGuard {
     Counters.Counter private _collectionIds;
 
     /* details of the collection */
-    struct Collection {
+    struct Info {
         uint256 id;
         string cName;
         string author;
@@ -18,6 +18,10 @@ contract DigitalMuseum is ReentrancyGuard {
         string dynasty;
         Category genre;
         address curator;
+    }
+    struct Collection {
+        Info info;
+        string metaURL;
     }
     enum Category {
         jewelry,
@@ -47,14 +51,14 @@ contract DigitalMuseum is ReentrancyGuard {
         string memory _detailhash,
         string memory _imghash,
         string memory _dynasty,
-        Category _class
+        Category _class,
+        string memory _metaURL
     ) public nonReentrant isCurator {
         uint256 class = uint256(_class);
         require(class >= 0 || class <= 2, "invalid class parameter");
         _collectionIds.increment();
         uint256 _id = _collectionIds.current();
-        Collection memory newCollection = Collection(
-            _id,
+        Info memory info = Info(_id,
             _name,
             _author,
             _detailhash,
@@ -62,6 +66,10 @@ contract DigitalMuseum is ReentrancyGuard {
             _dynasty,
             _class,
             curator
+        );
+        Collection memory newCollection = Collection(
+            info,
+            _metaURL
         );
         idToCollection[_id] = newCollection;
     }
@@ -73,7 +81,7 @@ contract DigitalMuseum is ReentrancyGuard {
     {
         uint256 totalCollection = _collectionIds.current();
         for (uint256 i = 1; i <= totalCollection; i++) {
-            if (idToCollection[i].id == _collectionId) {
+            if (idToCollection[i].info.id == _collectionId) {
                 delete idToCollection[i];
             }
         }
@@ -86,7 +94,7 @@ contract DigitalMuseum is ReentrancyGuard {
 
         for (uint256 i = 1; i <= totalCollection; i++) {
             /* Gets the total of the exsiting collection */
-            if (idToCollection[i].curator != address(0)) {
+            if (idToCollection[i].info.curator != address(0)) {
                 listLength += 1;
             }
         }
@@ -94,7 +102,7 @@ contract DigitalMuseum is ReentrancyGuard {
         Collection[] memory list = new Collection[](listLength);
         for (uint256 i = 1; i <= totalCollection; i++) {
             /* if the collection exsits, push it to the array */
-            if (idToCollection[i].curator != address(0)) {
+            if (idToCollection[i].info.curator != address(0)) {
                 Collection storage currentItem = idToCollection[i];
                 list[currenIndex] = currentItem;
                 currenIndex += 1;
@@ -106,25 +114,18 @@ contract DigitalMuseum is ReentrancyGuard {
     function fetchColletionDetail(uint256 _collectionId)
         public
         view
-        returns (Collection memory)
+        returns (Info memory)
     {
-        return idToCollection[_collectionId];
+        Info memory info =  idToCollection[_collectionId].info;
+        return info;
     }
 
-    /* add collection to favorite list */
-    // function toggleFavor(uint256 _collectionId) public nonReentrant {
-    //     /* If the collection is not favored */
-    //     if (favorList[msg.sender][_collectionId].curator == address(0)) {
-    //         favorList[msg.sender].push(idToCollection[_collectionId]);
-    //     } else {
-    //         for (uint256 i = 0; i < favorList[msg.sender].length; i++) {
-    //             if (favorList[msg.sender][i].id == _collectionId)
-    //                 delete favorList[msg.sender][_collectionId];
-    //         }
-    //     }
-    // }
-
-    // function getFavorList() public view returns (Collection[] memory) {
-    //     return favorList[msg.sender];
-    // }
+     function fetchColletionMeta(uint256 _collectionId)
+        public
+        view
+        returns (string memory)
+    {
+        string memory meta =  idToCollection[_collectionId].metaURL;
+        return meta;
+    }
 }
