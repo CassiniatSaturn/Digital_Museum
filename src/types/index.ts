@@ -13,6 +13,12 @@ export interface Collection {
   info:Info,
   metaURL:string
 }
+
+export interface CollectionWithMeta{
+  id: string,
+  cName: string
+  meta:ManageMeta
+}
 export enum Category {
   jewelry,
   painting,
@@ -41,6 +47,13 @@ export interface MetaItem {
   image: string
 }
 
+
+export interface ManageMeta{
+  recorder:string,
+  date:string,
+  level:string,
+  cid:string
+}
 /* 
 struct Auction {
         // The value of the current highest bid.
@@ -67,6 +80,15 @@ export interface Auction {
   curator:string
 }
 
+export enum Role{
+  Admin,
+  visitor,
+}
+
+export interface User{
+  account:string,
+  role:Role
+}
 
 
 

@@ -15,6 +15,7 @@ module.exports = {
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
+      mainBg:'#1E0338',
 
       black: colors.black,
       white: colors.white,
@@ -544,6 +545,7 @@ module.exports = {
     minWidth: {
       0: '0px',
       full: '100%',
+      'body':'1280px',
       min: 'min-content',
       max: 'max-content',
     },
@@ -789,6 +791,7 @@ module.exports = {
       '9/12': '75%',
       '10/12': '83.333333%',
       '11/12': '91.666667%',
+      'bodySet':'1280px',
       full: '100%',
       screen: '100vw',
       min: 'min-content',

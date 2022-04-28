@@ -1,5 +1,5 @@
 import { museumContract, digitalMuseum } from '@/Web3/web3/index'
-import { Collection } from '@/types/index'
+import { Collection, Info } from '@/types/index'
 /* Read Collection List */
 async function getCollections(): Promise<Collection[]> {
   const result: Collection[] = await museumContract.methods.getCollections().call()
@@ -16,7 +16,7 @@ async function removeCollection(collectionId:string){
   await museumContract.methods.removeCollection(collectionId).send({from:digitalMuseum.from})
 }
 /* Fetches the infomation of the collection */
-async function fetchColletionDetail(collectionId:string,account:string):Promise<Collection>{
+async function fetchColletionDetail(collectionId:string,account:string):Promise<Info>{
   const item = await museumContract.methods.fetchColletionDetail(collectionId).call({from:account})
   return item
 }
