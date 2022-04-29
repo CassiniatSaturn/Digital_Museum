@@ -37,6 +37,8 @@ const state = reactive({ createdCollections: {} as Array<CollectionWithMeta> })
 onMounted(async () => {
   /* get all collections */
   const originList = await getCollections()
+  console.log(originList);
+  
   /* get meta of collections */
   state.createdCollections = await Promise.all(
     originList.map(
@@ -53,7 +55,6 @@ onMounted(async () => {
       }
     ))
   console.log(state.createdCollections);
-
 })
 
 const deleteCollection = async (itemID: string) => {

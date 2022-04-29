@@ -19,10 +19,10 @@
             <span class=" px-4">|</span>
             删除
           </button>
-          <!-- <button v-if="item.status != ItemStatus.OnAuction" @click="deleteItem(item.itemId)">
+          <button v-if="item.status == ItemStatus.OnAuction" @click="cancelAuc(item.itemId)">
             <span class=" px-4">|</span>
             取消拍卖
-          </button> -->
+          </button>
         </th>
       </tr>
     </table>
@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { fetchItemsCreated, removeMktItem } from '@/service/EthService/mktService';
+import { cancelAuction, fetchItemsCreated, removeMktItem } from '@/service/EthService/mktService';
 import { MarketItem } from '@/types';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { ItemStatus } from '@/types';
@@ -72,4 +72,10 @@ const filteredStatus = computed(() => {
     return result
   }
 })
+
+/* cancel auction */
+const cancelAuc = async (id: string) => {
+  await cancelAuction(id)
+  state.createdList = await fetchItemsCreated()
+}
 </script>

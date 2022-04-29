@@ -1,7 +1,6 @@
 <template>
   <div class=" w-8/12 mx-auto">
     <div class=" text-gray-400 text-lg pt-10 pb-5">{{ state.detail.cName }} · {{ genre(state.detail.genre) }}</div>
-
     <div class=" flex text-white">
       <img :src="getFileUrl(state.detail.imgHash)" class=" w-1/2 pr-20" />
       <div class=" w-1/2">

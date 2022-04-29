@@ -12,7 +12,8 @@ import '@quasar/extras/material-icons/material-icons.css'
 import "ant-design-vue/dist/antd.css";
 import { Upload,Modal, List,Statistic } from 'ant-design-vue'
 import plugin from "@/icons/index";
-
+import moment from 'moment'
+import 'moment/locale/zh-cn'
 const app = createApp(App)
 
 app.use(store).use(router).use(Quasar).use(Upload).use(Modal).use(List).use(Statistic).use(plugin, {

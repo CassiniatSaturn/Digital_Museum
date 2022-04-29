@@ -32,6 +32,7 @@ import { getFileUrl } from "@/service/ipfsService";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons-vue";
 import * as ipfs_core from "ipfs-core";
 import { IPFS } from "ipfs-core-types";
+import { useRouter } from "vue-router";
 
 /* create the instance of ipfs */
 let ipfs = {} as IPFS;
@@ -46,6 +47,7 @@ const itemName = ref("");
 const description = ref("");
 const url = ref('')
 
+const router = useRouter()
 const createItem = async () => {
   if (!itemName.value || !description.value || !imageUrl.value) return
   const data = JSON.stringify({
@@ -54,6 +56,7 @@ const createItem = async () => {
   const result = await ipfs.add(data)
   url.value = getFileUrl(result.path)
   await createMktItem(url.value)
+  router.push({name:'Dashboard'})
 };
 
 /* Upload img to IPFS */

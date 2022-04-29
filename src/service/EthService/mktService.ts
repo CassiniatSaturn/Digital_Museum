@@ -1,5 +1,5 @@
 import { nftContract, mktContract, digitalMuseum, web3 } from '@/Web3/web3/index'
-import { Auction, MarketItem, MetaItem } from '@/types/index'
+import { Auction, BidHistory, MarketItem, MetaItem } from '@/types/index'
 import { nftaddress } from '@/Web3/config'
 import { converURLToMeta } from '@/utils/convertURLToMeta'
 
@@ -99,16 +99,25 @@ async function fetchAuction(itemId: string, account: string): Promise<Auction> {
   return result
 }
 
-async function verifyAuction(account:string){
-  const result = await mktContract.getPastEvents('AuctionBid',{
-    filter:{
-      sender:[account]
-    }
+async function verifyAuction(tokenId:number): Promise<BidHistory[]> {
+  const list = await mktContract.getPastEvents('AuctionBid', {
+    filter:{tokenId:tokenId},
+    fromBlock: 0,
+    toBlock: 'latest'
+  }, (err, e) => {
+    console.log(e);
   })
-  if(result[0]){
-    /* query my bid amount */
-    console.log(result[0]);
-  }
+  const history = Promise.all(list.map(async i => {
+    return (
+      async () => {
+        const { sender, tokenId, value } = i.returnValues
+        const timestamp = (await web3.eth.getBlock(i.blockNumber)).timestamp
+        const result: BidHistory = { timestamp: timestamp + '000', sender: sender, tokenId: tokenId, value: value }
+        return result
+      }
+    )()
+  }));
+  return history
 }
 
 export {

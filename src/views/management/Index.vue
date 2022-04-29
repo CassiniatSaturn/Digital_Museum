@@ -2,19 +2,16 @@
   <div class=" border border-white rounded-lg w-10/12 mx-auto mt-24 text-white px-16">
     <div class=" text-2xl font-bold my-12">展示信息</div>
     <!-- upload -->
-
-      <a-upload-dragger class="uploadragger" v-model:file-list="state.fileList" name="file" :maxCount="1" :multiple="false"
-        @change="handleChange">
-        <p class="ant-upload-drag-icon">
-          <inbox-outlined :style="{color:'white'}"></inbox-outlined>
-        </p>
-        <p class="ant-upload-text">点击上传</p>
-        <p class="ant-upload-hint">
-          支持图片、视频等格式
-        </p>
-      </a-upload-dragger>
-
-
+    <a-upload-dragger class="uploadragger" v-model:file-list="state.fileList" name="file" :maxCount="1"
+      :multiple="false" @change="handleChange" :before-upload="beforeUpload">
+      <p class="ant-upload-drag-icon">
+        <inbox-outlined :style="{ color: 'white' }"></inbox-outlined>
+      </p>
+      <p class="ant-upload-text">点击上传</p>
+      <p class="ant-upload-hint">
+        支持图片(jpg,png)、视频(mp4)格式
+      </p>
+    </a-upload-dragger>
     <div class=" flex mt-8 justify-between">
       <div class=" w-96">
         <p>展品名称</p>
@@ -81,13 +78,10 @@ import { InboxOutlined } from '@ant-design/icons-vue';
 import { ref, onMounted, reactive, computed, toRefs } from "vue";
 import { getCollections, createCollection } from "@/service/EthService/museumService";
 import { fetchFromIpfs, getFileUrl } from "@/service/ipfsService";
-import { Collection } from "@/types";
 import { Upload } from "ant-design-vue";
 import { message } from "ant-design-vue";
-import { PlusOutlined, LoadingOutlined } from "@ant-design/icons-vue";
 import * as ipfs_core from "ipfs-core";
 import { IPFS } from "ipfs-core-types";
-import classes from "@/assets/css/style.module.css"
 
 
 /* create the instance of ipfs */
@@ -111,7 +105,7 @@ const level = ref('')
 const desHash = ref("");
 
 const createNewCollection = async () => {
-  if (cName.value && author.value && description.value && dynasty.value && type.value) {
+  if (cName.value && author.value && description.value && dynasty.value) {
     /* upload the description to IPFS */
     ipfs
       .add(description.value)
@@ -138,7 +132,16 @@ const createNewCollection = async () => {
   else return
 };
 
-/* Upload img to IPFS */
+/* Upload resource to IPFS */
+const beforeUpload = (file: FileItem) => {
+  const isPNG = file.type === 'image/png'
+  const isJPG = file.type === 'image/jpg'
+  // const isMP4 = file.type === 'video/mp4'
+  if (!isPNG && !isJPG ) {
+    message.error(`文件格式不支持`);
+  }
+  return isPNG || Upload.LIST_IGNORE;
+};
 const state = reactive({ fileList: [] as FileItem[] })
 const loading = ref<boolean>(false);
 let imgHash = ref("");
@@ -180,12 +183,11 @@ const handleChange = (info: FileInfo) => {
 
 const modilfyType = () => {
   type.value = typeList.indexOf(displayedValue.value)
-  console.log(type.value);
 }
 </script>
 
 <style lang="scss">
-.uploadragger > .ant-upload-drag {
+.uploadragger>.ant-upload-drag {
   color: white;
   text-align: center;
   background: transparent;
@@ -194,9 +196,10 @@ const modilfyType = () => {
   cursor: pointer;
 }
 
-.ant-upload.ant-upload-drag p.ant-upload-text{
+.ant-upload.ant-upload-drag p.ant-upload-text {
   color: #FFFFFF;
 }
+
 .ant-upload.ant-upload-drag p.ant-upload-hint {
   color: #FFFFFF;
 }

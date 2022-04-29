@@ -8,15 +8,14 @@ export async function converURLToMeta(itemsList: Array<MarketItem>) {
     return (
       async () => {
         const uri = await getTokenURI(i.tokenId)
-        console.log(uri, i.tokenId);
-
         /* Gets metadata from ipfs */
         const end = baseURL.length
         const hash = uri.substring(end + 1, uri.length + 1)
         const metadata: MetaItem = (await fetchFromIpfs(hash)).data
         const itemWithMeta = { ...i, info: metadata }
         return itemWithMeta
-      })()
+      }
+    )()
   }))
   return result
 }

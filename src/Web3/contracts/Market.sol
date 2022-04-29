@@ -423,9 +423,7 @@ contract Market is ReentrancyGuard {
         if (auctionEnds(itemId) < block.timestamp.add(TIME_BUFFER)) {
             // We add onto the duration whenever time increment is required, so
             // that the auctionEnds at the current time plus the buffer.
-            auctions[itemId].duration += block.timestamp.add(TIME_BUFFER).sub(
-                auctionEnds(itemId)
-            );
+            auctions[itemId].duration += TIME_BUFFER;
         }
         // Emit the event that a bid has been made.
         emit AuctionBid(itemId, msg.sender, amount);

@@ -1,5 +1,5 @@
 /* agree with the Collection Type in .sol file */
-export interface Info{
+export interface Info {
   id: string
   cName: string
   author: string
@@ -7,17 +7,17 @@ export interface Info{
   imgHash: string
   dynasty: string
   genre: Category
-  curator?:string,
+  curator?: string,
 }
 export interface Collection {
-  info:Info,
-  metaURL:string
+  info: Info,
+  metaURL: string
 }
 
-export interface CollectionWithMeta{
+export interface CollectionWithMeta {
   id: string,
   cName: string
-  meta:ManageMeta
+  meta: ManageMeta
 }
 export enum Category {
   jewelry,
@@ -33,12 +33,14 @@ export enum ItemStatus {
 }
 
 export interface MarketItem {
+  reservePrice?: string,
   itemId: string,
   nftContractAdd: string,
   tokenId: string,
   price?: string,
   info?: MetaItem,
-  status: ItemStatus
+  status: ItemStatus,
+  owner: string
 }
 
 export interface MetaItem {
@@ -48,11 +50,18 @@ export interface MetaItem {
 }
 
 
-export interface ManageMeta{
-  recorder:string,
-  date:string,
-  level:string,
-  cid:string
+export interface ManageMeta {
+  recorder: string,
+  date: string,
+  level: string,
+  cid: string
+}
+
+export interface BidHistory {
+  timestamp: string
+  sender: string
+  tokenId: string
+  value: string
 }
 /* 
 struct Auction {
@@ -72,22 +81,22 @@ struct Auction {
         address curator;
     } */
 export interface Auction {
-  amount:string,
-  duration:string,
-  firstBidTime:string,
-  reservePrice:string,
-  bidder:string,
-  curator:string
+  amount: string,
+  duration: string,
+  firstBidTime: string,
+  reservePrice: string,
+  bidder: string,
+  curator: string
 }
 
-export enum Role{
+export enum Role {
   Admin,
   visitor,
 }
 
-export interface User{
-  account:string,
-  role:Role
+export interface User {
+  account: string,
+  role: Role
 }
 
 
