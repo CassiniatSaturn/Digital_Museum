@@ -1,11 +1,13 @@
 <template>
-  <div>
+  <div class="flex flex-wrap border border-white rounded-lg w-10/12 mx-auto text-white px-16 py-8 mt-20">
     <div>
-      <div v-for="item in state.nftList" :key="item.itemId">
-        <div>{{ item.info?.name }}</div>
-        <div>{{ item.info?.description }}</div>
-        <div>
+      <div v-for="item in state.nftList" :key="item.itemId" class=" w-1/3 px-4">
+        <div class=" w-full" @click="$router.push({ name: 'NFTDetail', query: { id: item.itemId } })">
           <img :src="item.info?.image" />
+          <div class=" text-center py-4 text-gray-400">{{ item.info?.name }}</div>
+        </div>
+        <div class=" flex items-center justify-center">{{ item.reservePrice ? item.reservePrice : item.price }}
+          <SvgIcon iconClass="eth" class="w-5 h-5"></SvgIcon>
         </div>
       </div>
     </div>
