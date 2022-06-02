@@ -46,6 +46,8 @@ async function createAuction(itemId: string, duration: number, reservePrice: num
 /* Reads items created by me */
 async function fetchItemsCreated(): Promise<MarketItem[]> {
   const itemsList: Array<MarketItem> = await mktContract.methods.fetchItemsCreated().call({ from: digitalMuseum.from })
+  console.log(itemsList);
+  
   const result = await converURLToMeta(itemsList)
   console.log(result);
 

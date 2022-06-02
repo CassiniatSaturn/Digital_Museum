@@ -9,7 +9,7 @@
       </p>
       <p class="ant-upload-text">点击上传</p>
       <p class="ant-upload-hint">
-        支持图片(jpg,png)、视频(mp4)格式
+        支持图片(jpg,png)格式
       </p>
     </a-upload-dragger>
     <div class=" flex mt-8 justify-between">
@@ -82,6 +82,7 @@ import { Upload } from "ant-design-vue";
 import { message } from "ant-design-vue";
 import * as ipfs_core from "ipfs-core";
 import { IPFS } from "ipfs-core-types";
+import { useRouter } from 'vue-router';
 
 
 /* create the instance of ipfs */
@@ -103,6 +104,7 @@ const recordDate = ref('')
 const recorder = ref('')
 const level = ref('')
 const desHash = ref("");
+const router = useRouter()
 
 const createNewCollection = async () => {
   if (cName.value && author.value && description.value && dynasty.value) {
@@ -127,6 +129,7 @@ const createNewCollection = async () => {
           type.value,
           result.path
         );
+        router.push('/manageCollections')
       });
   }
   else return
@@ -134,10 +137,13 @@ const createNewCollection = async () => {
 
 /* Upload resource to IPFS */
 const beforeUpload = (file: FileItem) => {
+  console.log(file.type);
+  
   const isPNG = file.type === 'image/png'
   const isJPG = file.type === 'image/jpg'
+  const isJPEG = file.type === 'image/jpeg'
   // const isMP4 = file.type === 'video/mp4'
-  if (!isPNG && !isJPG ) {
+  if (!isPNG && !isJPG && !isJPEG) {
     message.error(`文件格式不支持`);
   }
   return isPNG || Upload.LIST_IGNORE;
