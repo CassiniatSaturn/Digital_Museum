@@ -90,7 +90,6 @@ const handleChange = (info: FileInfo) => {
     ipfs.add(buffer).then((result) => {
       imgHash.value = result.path;
       imageUrl.value = getFileUrl(imgHash.value);
-      console.log(imgHash.value);
     });
   };
 };
